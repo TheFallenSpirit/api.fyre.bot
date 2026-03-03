@@ -1,0 +1,19 @@
+{
+	"name": "fyre-bot-api",
+	"version": "0.0.0",
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"itty-router": "^5.0.23",
+		"valibot": "^1.2.0"
+	},
+	"devDependencies": {
+		"@types/node": "^25.3.2",
+		"typescript": "^5.5.2",
+		"wrangler": "^4.69.0"
+	}
+}
