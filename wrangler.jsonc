@@ -7,11 +7,20 @@
 	"name": "fyre-bot-api",
 	"main": "src/app.ts",
 	"compatibility_date": "2026-02-28",
+	"workers_dev": true,
+	"preview_urls": false,
 	"observability": {
 		"enabled": true
 	},
 	"compatibility_flags": [
 		"nodejs_compat"
+	],
+	"routes": [
+		{
+			"pattern": "api.fyre.bot",
+			"zone_name": "fyre.bot",
+			"custom_domain": true
+		}
 	],
 	"kv_namespaces": [
 		{
@@ -19,8 +28,5 @@
 			"id": "1534315859434b1d92f6a8f6ca6a1b5c",
 			"preview_id": "fdea7f077a3e407994cac70e6656d1f8"
 		}
-	],
-	"vars": {
-		"env": "development"
-	}
+	]
 }

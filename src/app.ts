@@ -1,10 +1,17 @@
-import { json, Router } from 'itty-router';
+import { cors, json, Router } from 'itty-router';
 import getTestimonials from './routes/getTestimonials';
 import addTestimonial from './routes/addTestimonial';
 import removeTestimonial from './routes/removeTestimonial';
 import { authMiddleware } from './common';
 
-const router = Router();
+const { corsify, preflight } = cors({
+	origin: '*'
+});
+
+const router = Router({
+	before: [preflight],
+	finally: [corsify]
+});
 
 router.get('/testimonials', getTestimonials);
 router.post('/testimonials', authMiddleware, addTestimonial);
