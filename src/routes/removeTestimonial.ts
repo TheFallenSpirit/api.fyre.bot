@@ -1,5 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { error, IRequest, json } from 'itty-router';
+import { clearCache } from '../common';
 
 export default async (request: IRequest) => {
     const authorId = request.params.authorId;
@@ -11,9 +12,7 @@ export default async (request: IRequest) => {
     });
 
     await env.testimonials.delete(authorId);
-    const url = new URL(request.url);
-    url.pathname = '/testimonials';
-    await caches.default.delete(url);
+    await clearCache(request);
 
     return json({
         error: false,

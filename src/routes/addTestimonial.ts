@@ -1,12 +1,15 @@
 import { error, IRequest, json } from 'itty-router';
 import { maxLength, minLength, nonEmpty, object, pipe, safeParse, string } from 'valibot';
-import { getTestimonialInfo, issuesToMessages, Testimonial } from '../common';
+import { clearCache, getTestimonialInfo, issuesToMessages, Testimonial } from '../common';
 import { env } from 'cloudflare:workers';
 
 const testimonialSchema = object({
-   message: pipe(string(), nonEmpty()),
-   guildId: pipe(string(), nonEmpty(), minLength(17), maxLength(20)),
-   authorId: pipe(string(), nonEmpty(), minLength(17), maxLength(20))
+    message: pipe(string(), nonEmpty()),
+    guildId: pipe(string(), nonEmpty(), minLength(17), maxLength(20)),
+    author: object({
+        id: pipe(string(), nonEmpty(), minLength(17), maxLength(20)),
+        position: pipe(string(), nonEmpty())
+    })
 });
 
 export default async (request: IRequest) => {
@@ -28,20 +31,18 @@ export default async (request: IRequest) => {
         message: output.message,
         expiresAt: Date.now() + 259_200_000,
         guild: { id: output.guildId, ...info.guild },
-        author: { id: output.authorId, ...info.author }
+        author: { id: output.author.id, position: output.author.position, ...info.author }
     };
 
     await env.testimonials.put(
-        output.authorId,
+        output.author.id,
         JSON.stringify(testimonial)
     );
 
-    const url = new URL(request.url);
-    url.pathname = '/testimonials';
-    await caches.default.delete(url);
+    await clearCache(request);
 
     return json({
         error: false,
-        messages: [`Successfully set testimonial for user "${output.authorId}".`]
+        messages: [`Successfully set testimonial for user "${output.author.id}".`]
     }, { status: 201 });
 };

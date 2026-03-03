@@ -39,12 +39,9 @@ async function updateExpiredTestimonials(testimonials: Testimonial[]) {
     const expiresAt = Date.now() + 259_200_000;
 
     for await (const oldTestimonial of testimonials) {
-        const guildId = oldTestimonial.guild.id;
-        const authorId = oldTestimonial.author.id;
-
         const info = await getTestimonialInfo({
-            guildId,
-            authorId
+            guildId: oldTestimonial.guild.id,
+            author: { ...oldTestimonial.author }
         });
 
         if (!info) {
@@ -53,14 +50,14 @@ async function updateExpiredTestimonials(testimonials: Testimonial[]) {
         };
 
         const testimonial: Testimonial = {
-            message: oldTestimonial.message,
             expiresAt,
-            guild: { id: guildId, ...info.guild },
-            author: { id: authorId, ...info.author }
+            message: oldTestimonial.message,
+            guild: { ...oldTestimonial.guild, ...info.author },
+            author: { ...oldTestimonial.author, ...info.author }
         };
 
         await env.testimonials.put(
-            authorId,
+            oldTestimonial.author.id,
             JSON.stringify(testimonial)
         );
     };

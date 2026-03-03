@@ -21,7 +21,7 @@ export async function getTestimonialInfo(raw: Omit<RawTestimonial, 'message'>): 
         'Authorization': `Bot ${env.discordToken}`
     };
 
-	const userInfoRequest = await fetch(`https://discord.com/api/v10/users/${raw.authorId}`, {
+	const userInfoRequest = await fetch(`https://discord.com/api/v10/users/${raw.author.id}`, {
 		headers: discordHeaders
 	}).catch(() => {});
 
@@ -42,7 +42,7 @@ export async function getTestimonialInfo(raw: Omit<RawTestimonial, 'message'>): 
         },
         author: {
             name: userInfo.global_name ?? userInfo.username,
-            avatarUrl: `https://cdn.discordapp.com/avatars/${raw.authorId}/${userInfo.avatar}.webp`
+            avatarUrl: `https://cdn.discordapp.com/avatars/${raw.author.id}/${userInfo.avatar}.webp`
         }
     };
 };
@@ -58,6 +58,12 @@ export function authMiddleware(request: IRequest) {
         error: true,
         messages: [`The provided "Authorization" header isn't a valid auth token.`]
     });
+};
+
+export async function clearCache(request: IRequest) {
+    const url = new URL(request.url);
+    url.pathname = '/testimonials';
+    await caches.default.delete(url);
 };
 
 type Schema = BaseSchema<unknown, unknown, BaseIssue<unknown>>;
@@ -76,7 +82,10 @@ interface TestimonialInfo {
 export interface RawTestimonial {
     message: string;
     guildId: string;
-    authorId: string;
+    author: {
+        id: string;
+        position: string;
+    };
 }
 
 export interface Testimonial {
@@ -90,6 +99,7 @@ export interface Testimonial {
     author: {
         id: string;
         name: string;
+        position: string;
         avatarUrl: string;
     };
 }
