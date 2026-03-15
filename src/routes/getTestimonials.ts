@@ -27,12 +27,17 @@ export default async (request: IRequest, context: ExecutionContext) => {
         context.waitUntil(updateExpiredTestimonials(expiredTestimonials));
     };
 
-    const cacheResponse = new Response(JSON.stringify(testimonials), {
+    const responseBody = {
+        error: false,
+        data: testimonials
+    };
+
+    const cacheResponse = new Response(JSON.stringify(responseBody), {
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=10800' }
     });
 
     context.waitUntil(cache.put(url, cacheResponse));
-    return json(testimonials);
+    return json(responseBody);
 };
 
 async function updateExpiredTestimonials(testimonials: Testimonial[]) {

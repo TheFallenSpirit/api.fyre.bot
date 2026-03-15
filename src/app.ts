@@ -28,7 +28,7 @@ router.all('*', (request) => {
 
 export default { fetch };
 
-async function fetch(request: Request, context: ExecutionContext) {
+async function fetch(request: Request, _env: Env, context: ExecutionContext) {
 	return router.fetch(request, context);
 };
 
